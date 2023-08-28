@@ -6,10 +6,10 @@ import typer
 from modules.dart.dart_commands import DartCommands as commands
 
 console = Console()
-typer = typer.Typer()
+app = typer.Typer()
 
 
-@typer.command()
+@app.command()
 def init(
     name: Annotated[str, "The name of the project"],
 ):
@@ -17,4 +17,4 @@ def init(
 
 
 if __name__ == "__main__":
-    typer()
+    app()
