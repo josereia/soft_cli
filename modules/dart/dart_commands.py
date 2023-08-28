@@ -1,18 +1,22 @@
 from rich.console import Console
-from rich.progress import Progress
-from abc import ABC
 
-# commands
-from modules.dart.commands.dart_init_command import DartInitCommand as commands
+from rich.progress import Progress
+from dart_functions import DartFunctions
+from commands_abc import CreateCommandsABC
+import typer
 
 console = Console()
 
+app = typer.Typer()
 
-class DartCommands(ABC):
-    @staticmethod
-    def init(
+
+class DartCreateCommands2(CreateCommandsABC):
+    @app.command()
+    def qualquer_coisa(
         name: str,
     ):
+        commands = DartFunctions(name)
+
         with Progress() as progress:
             task1 = progress.add_task(
                 "[#734AC9 bold]Creating project files[/]",
@@ -23,19 +27,20 @@ class DartCommands(ABC):
                 total=4,
             )
             progress.update(task1, advance=1)
-            commands.create_project(name)
+            commands.create_project()
             progress.update(task1, advance=1)
-            commands.create_core_folder(name)
+            commands.create_core_folder()
             progress.update(task1, advance=1)
-            commands.create_modules_folder(name)
+            commands.create_modules_folder()
             progress.update(task1, advance=1)
-            commands.copy_analysis_options(name)
+            commands.copy_analysis_options()
             progress.update(task1, advance=1)
             progress.update(task2, advance=1)
-            commands.add_very_good_analysis(name)
+            commands.add_very_good_analysis()
             progress.update(task2, advance=1)
-            commands.get_packages(name)
+            commands.get_packages()
             progress.update(task2, advance=1)
-            commands.git_init(name)
+            commands.git_init()
             progress.update(task2, advance=1)
         console.print(f"[bold green]Project {name} created successfully![/]")
+        print("qualquer_coisa")

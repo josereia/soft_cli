@@ -1,4 +1,15 @@
 {
-  "cSpell.words": ["pubspec", "typer", "typers"],
+  "cSpell.words": [
+    "Figlet",
+    "fonty",
+    "mysql",
+    "pubspec",
+    "pyfiglet",
+    "pyfigletfonts",
+    "typer",
+    "typers",
+    "usecase",
+    "yamlfile"
+  ],
   "editor.tabSize": 2
 }

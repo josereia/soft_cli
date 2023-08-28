@@ -9,6 +9,8 @@ mypy = "*"
 pyfiglet = "*"
 typer = "*"
 colorama = "*"
+pyyaml = "*"
+types-pyyaml = "*"
 
 [dev-packages]
 
