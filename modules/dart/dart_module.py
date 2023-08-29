@@ -2,7 +2,7 @@ from rich.console import Console
 import typer
 
 # commands
-from modules.dart.commands.create_command import app as create_command
+from modules.create_command_app import app_create
 
 
 console = Console()
@@ -11,7 +11,7 @@ app = typer.Typer()
 
 # subcommands
 app.add_typer(
-    create_command,
+    app_create,
     name="create",
     help="Create a new module, usecase, repository, datasource or driver.",
 )

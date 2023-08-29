@@ -1,8 +1,12 @@
 from abc import ABC, abstractmethod
 
+# from typer import Option
+# from typing_extensions import Annotated
+# from typing import Optional
+
 
 class CreateCommandsABC(ABC):
-    def __init__(self, name) -> None:
+    def __init__(self, name: str = "new_project") -> None:
         super().__init__()
         self._name = name
 
@@ -15,7 +19,13 @@ class CreateCommandsABC(ABC):
         self._name = new_name
 
     @abstractmethod
-    def project(self):
+    def project(
+        self,
+        # database: Annotated[
+        #     Optional[str],
+        #     Option("--database"),
+        # ] = None,
+    ):
         ...
 
     @abstractmethod
@@ -45,3 +55,7 @@ class CreateCommandsABC(ABC):
     @abstractmethod
     def error(self):
         ...
+
+
+class UpdateCommand(ABC):
+    ...

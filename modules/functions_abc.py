@@ -3,7 +3,7 @@ from assets.path_getter import ASSETS_DIR
 
 
 class FunctionsABC(ABC):
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str = "new_project") -> None:
         super().__init__()
         self._assets = ASSETS_DIR
         self._name = name

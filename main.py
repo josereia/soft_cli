@@ -1,8 +1,7 @@
 from rich.console import Console
-from rich.prompt import Prompt
-import typer
+from typer import Typer, run
 from os import getcwd, path
-from utils.utils import make_soft_file
+from utils.functions import make_soft_file
 
 # modules
 from modules.dart.dart_module import app as dart_module
@@ -10,7 +9,7 @@ from modules.dart.dart_module import app as dart_module
 ROOT_DIR: str = path.dirname(path.abspath(__file__))
 
 console = Console()
-app = typer.Typer()
+app = Typer()
 
 # typers
 app.add_typer(dart_module, name="dart")
@@ -21,17 +20,9 @@ def welcome():
     if path.exists(file_path):
         ...
     else:
-        language = Prompt.ask(
-            "Chose which language your project written:",
-            choices=["dart", "javascript", "python"],
-        )
-        database = Prompt.ask(
-            "Chose which database your project uses:",
-            choices=["postgresql", "mongodb", "mysql"],
-        )
-        make_soft_file(language, database)
+        make_soft_file()
 
 
 if __name__ == "__main__":
     app()
-    typer.run(welcome)
+    run(welcome)
