@@ -1,8 +1,8 @@
-import os
-from os import getcwd, path
+from os import getcwd
 import shutil
 import subprocess
 from modules.functions_abc import FunctionsABC
+from pathlib import Path
 
 
 class DartFunctions(FunctionsABC):
@@ -17,8 +17,14 @@ class DartFunctions(FunctionsABC):
         ...
 
     def create_folders(self):
-        os.mkdir(path.normpath(f"{getcwd()}/{self.name}/lib/core"))
-        os.mkdir(path.normpath(f"{getcwd()}/{self.name}/lib/modules"))
+        Path(f"{getcwd()}/{self.name}/lib/core").mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+        Path(f"{getcwd()}/{self.name}/lib/modules").mkdir(
+            parents=True,
+            exist_ok=True,
+        )
 
     def get_dependencies(self):
         subprocess.run(
@@ -38,8 +44,8 @@ class DartFunctions(FunctionsABC):
 
     def copy_analysis_options(self):
         shutil.copyfile(
-            path.normpath(f"{self._assets}/dart/analysis_options.yaml"),
-            path.normpath(f"{getcwd()}/{self.name}/analysis_options.yaml"),
+            Path(f"{self._assets}/dart/analysis_options.yaml"),
+            Path(f"{getcwd()}/{self.name}/analysis_options.yaml"),
         )
 
     def add_very_good_analysis(self):
