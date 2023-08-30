@@ -6,6 +6,8 @@
     "pubspec",
     "pyfiglet",
     "pyfigletfonts",
+    "softcli",
+    "softfile",
     "SUCC",
     "typer",
     "typers",
