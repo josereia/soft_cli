@@ -7,7 +7,7 @@ from rich.logging import RichHandler
 
 def get_logger(name: str) -> logging.Logger:
     """Get logger with rich configuration."""
-    level = os.getenv("LOG_LEVEL", logging.INFO)
+    level = os.getenv("LOG_LEVEL", logging.DEBUG)
     logging.basicConfig(
         level=level,
         format="%(message)s",

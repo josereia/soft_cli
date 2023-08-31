@@ -1,17 +1,22 @@
 {
   "cSpell.words": [
+    "datasources",
     "Figlet",
     "fonty",
+    "mongodb",
     "mysql",
+    "postgresql",
     "pubspec",
     "pyfiglet",
     "pyfigletfonts",
     "softcli",
     "softfile",
+    "subfolders",
     "SUCC",
     "typer",
     "typers",
     "usecase",
+    "usecases",
     "yamlfile"
   ],
   "editor.tabSize": 2

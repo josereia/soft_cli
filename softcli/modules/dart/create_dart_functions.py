@@ -6,6 +6,7 @@ from rich.console import Console
 from rich.progress import Progress
 import shutil
 import subprocess
+from utils import make_folder
 
 console = Console()
 logger = get_logger(__file__)
@@ -82,7 +83,7 @@ def add_very_good_analysis(name: str = "new_project"):
     )
 
 
-def create_project_manager(name: str = "new_project"):
+def create_project_manager(path: Path, name: str = "new_project"):
     with Progress() as progress:
         task1 = progress.add_task(
             "[purple4 bold]Creating project files[/]",
@@ -112,5 +113,62 @@ def create_project_manager(name: str = "new_project"):
         )
 
 
+def make_domain(module_name: str):
+    path_domain = Path(f"{Path.cwd()}/lib/modules/{module_name}")
+    path_subfolders = Path(f"{Path.cwd()}/lib/modules/{module_name}/domain")
+
+    make_folder("domain", module_name, path_domain)
+    make_folder("entities", module_name, path_subfolders)
+    make_folder("usecases", module_name, path_subfolders)
+    make_folder("repositories", module_name, path_subfolders)
+    make_folder("errors", module_name, path_subfolders)
+    console.print(
+        f"[green]✓ Folder domain created in {module_name} successfully.[/]",
+    )
+
+
+def make_infra(module_name: str):
+    path_infra = Path(f"{Path.cwd()}/lib/modules/{module_name}")
+    path_subfolders = Path(f"{Path.cwd()}/lib/modules/{module_name}/infra")
+
+    make_folder("infra", module_name, path_infra)
+    make_folder("datasources", module_name, path_subfolders)
+    make_folder("models", module_name, path_subfolders)
+    make_folder("repositories", module_name, path_subfolders)
+    console.print(
+        f"[green]✓ Folder infra created in {module_name} successfully.[/]",
+    )
+
+
+def make_external(module_name: str):
+    path_external = Path(f"{Path.cwd()}/lib/modules/{module_name}")
+    path_subfolders = Path(f"{Path.cwd()}/lib/modules/{module_name}/external")
+
+    make_folder("external", module_name, path_external)
+    make_folder("datasources", module_name, path_subfolders)
+    make_folder("drivers", module_name, path_subfolders)
+    console.print(
+        f"[green]✓ Folder external created in {module_name} successfully.[/]",
+    )
+
+
+def make_module(name: str):
+    make_folder(name=name, path=Path(f"{Path.cwd()}/lib/modules"))
+    make_domain(name)
+    make_infra(name)
+    make_external(name)
+    make_folder(
+        "presentation",
+        name,
+        Path(
+            f"{Path.cwd()}/lib/modules/{name}",
+        ),
+    )
+    console.print(
+        f"[green]✓ Module {name} created successfully.[/]",
+    )
+
+
+# another function make_folders(module_name, main_name, path_main, path_sub)
 if __name__ == "__main__":
-    create_project_manager("teeste")
+    ...
