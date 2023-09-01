@@ -25,8 +25,8 @@ class Assets:
     """
 
     datasource_name_help = (
-        "Name of file. "
-        + "[italic]:cross_mark: Don't add language extension.[/]"
+        "Name of file. [italic]:cross_mark: "
+        + "Don't add language extension.[/]"
     )
 
     datasource_module_name_help = """

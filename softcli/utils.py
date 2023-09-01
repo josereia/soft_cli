@@ -6,9 +6,10 @@ from pathlib import Path
 from rich.console import Console
 from rich.prompt import Prompt
 from string import Template
+from typer import Exit
 import yaml
 
-
+cwd = Path.cwd()
 console = Console()
 logger = get_logger(__file__)
 
@@ -20,17 +21,9 @@ d = {
 }
 
 
-# def template_formatter(template_path: Path, content: dict):
-#     """Format a file using a template file and dict data."""
-#     try:
-#         template = open(template_path, "rt")
-#         src = Template(template.read())
-#     except FileNotFoundError:
-#         logger.debug("Path of template was passed wrong. check the command.")
-#     else:
-#         result = src.substitute(content)
-#         template.close()
-#         return result
+class CustomTemplate(Template):
+    delimiter = "%$"
+    idpattern = r"[a-z][_a-z0-9]*"
 
 
 def make_class_file(
@@ -40,19 +33,22 @@ def make_class_file(
     content: dict,
     parent: str = "parent",
 ):
+    """Make a class file from template"""
     with open(f"{TEMPLATE_DIR}/{template_name}", "rt") as template:
-        src = Template(template.read())
+        src = CustomTemplate(template.read())
         template_content = src.substitute(content)
     try:
         with open(f"{create_path}/{name}.dart", "wt") as file:
             file.writelines(template_content)
     except TypeError:
-        logger.error("Template vazio **trocar dps.")
+        logger.debug("Template vazio **trocar dps.")
+        raise Exit(code=1)
     except FileExistsError:
         logger.info(f"File {name} already exist. check the {parent} folder.")
-        return False
+        raise Exit(code=1)
     except FileNotFoundError:
         logger.error(f"Something wrong with path provided, check the {parent}")
+        raise Exit(code=1)
     else:
         logger.info(f"File {name}.dart created successfully.")
 
@@ -68,8 +64,10 @@ def make_folder(name: str, parent: str = "parent", path: Path = Path.cwd()):
         logger.error(
             f"Folder {name} already exist, check your {parent} folder.",
         )
+        raise Exit(code=1)
     except FileNotFoundError:
         logger.error(f"Something wrong with path provided, check the {parent}")
+        raise Exit(code=1)
     else:
         logger.debug(f"Folder {name} created in {parent}.")
 
@@ -113,7 +111,7 @@ def get_config_info(path: Path = Path.cwd()) -> tuple | None:
     """Get info from softfile.yaml"""
     if not Path(f"{path}/.softfile.yaml").exists():
         logger.error(
-            "File softfile.yaml does not exist.",
+            "File softfile.yaml does not exist. check if you in root project",
         )
         return None, "not_exist"
     try:
@@ -135,7 +133,8 @@ def get_config_info(path: Path = Path.cwd()) -> tuple | None:
         )
     except AttributeError as error:
         logger.error(
-            f"Value for {error} is None. run " + "soft --config for make new softfile.",
+            f"Value for {error} is None. run  \
+             soft --config for make new softfile.",
         )
         return None
     except KeyError as key:
@@ -164,15 +163,10 @@ def soft_file_manager(name: str, path: Path = Path.cwd()) -> tuple | object:
 
 
 if __name__ == "__main__":
-    make_class_file(
-        "bloc_datasource",
-        Path(f"{Path.cwd()}/lib/modules/bloc/external/datasources"),
-        "datasource_impl_template.dart",
-        {
-            "class_name": "BlocDatasourceImpl",
-            "project_name": "zzz",
-            "module_name": "bloc",
-            "abstract_file": "bloc_datasource.dart",
-        },
-        "external/datasources",
-    )
+    content = {
+        "class_name": "TesteErrro",
+        "project_name": "acb",
+        "module_name": "module_name",
+        "import_file": "teste.dart",
+        "abstract_class": "tetste",
+    }

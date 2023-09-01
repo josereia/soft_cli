@@ -6,12 +6,109 @@ from rich.console import Console
 from rich.progress import Progress
 import shutil
 import subprocess
-from utils import make_folder
+from typer import Exit
+from utils import make_folder, make_class_file, cwd
 
 console = Console()
 logger = get_logger(__file__)
 
 
+# utils
+def class_name_formatter(name: str) -> str:
+    capitalize_parts = [part.capitalize() for part in name.split("_")]
+    class_name = "".join(capitalize_parts)
+    return class_name
+
+
+def make_couple_files(
+    name: str,
+    project_name: str,
+    module_name: str,
+    abstract_class: str,
+    path_abs: str,
+    abstract_template: str,
+    impl_class: str,
+    path_impl: str,
+    impl_template: str,
+    folder_name: str = "",
+):
+    # make a abstract class file
+    try:
+        make_class_file(
+            name,
+            Path(f"{cwd}/lib/modules/{module_name}/{path_abs}"),
+            abstract_template,
+            {
+                "class_name": abstract_class,
+            },
+        )
+    except IOError:
+        logger.error("Error writing file.")
+        raise Exit(code=1)
+    else:
+        logger.debug(f"File {name}.dart created successfully.")
+
+    # make a implements class file
+    if not folder_name:
+        try:
+            make_class_file(
+                f"{name}_impl",
+                Path(
+                    f"{cwd}/lib/modules/{module_name}/{path_impl}",
+                ),
+                impl_template,
+                {
+                    "class_name": impl_class,
+                    "project_name": project_name,
+                    "module_name": module_name,
+                    "import_file": f"{name}.dart",
+                    "abstract_class": abstract_class,
+                },
+            )
+        except IOError as error:
+            logger.error(f"{error}. Error writing file.")
+            raise Exit(code=1)
+        except Exception as error:
+            if error == ".":
+                logger.debug("Rethrow error from make_class_file.")
+
+            logger.info(
+                "On make class file throw error in path or file already exist",
+            )
+            raise Exit(code=1)
+        else:
+            logger.debug(f"File {name}_impl.dart created successfully.")
+
+    if folder_name:
+        try:
+            make_class_file(
+                f"{name}_impl",
+                Path(
+                    f"{cwd}/lib/modules/{module_name}/{path_impl}",
+                ),
+                impl_template,
+                {
+                    "class_name": impl_class,
+                    "project_name": project_name,
+                    "module_name": module_name,
+                    "import_file": f"{name}.dart",
+                    "abstract_class": abstract_class,
+                    "folder_name": folder_name,
+                },
+            )
+        except IOError as error:
+            logger.error(f"{error}. Error writing file.")
+            raise Exit(code=1)
+        except Exception as error:
+            logger.error(
+                f"{error}. **Add error on try block in make_couple_files",
+            )
+            raise Exit(code=1)
+        else:
+            logger.debug(f"File {name}_impl.dart created successfully.")
+
+
+# functions to command project
 def create_dart_project(name: str = "new_project") -> bool:
     """Create a dart project"""
     try:
@@ -27,10 +124,6 @@ def create_dart_project(name: str = "new_project") -> bool:
         return False
     else:
         return True
-
-
-def create_module(name: str = "new_project"):
-    ...
 
 
 def create_folders(name: str = "new_project"):
@@ -69,7 +162,7 @@ def copy_analysis_options(name: str = "new_project"):
     """Make a copy to analysis_options.yaml from assets of cli"""
     shutil.copyfile(
         Path(f"{MODELS_DIR}/analysis_options.yaml"),
-        Path(f"{Path.cwd()}/{name}/analysis_options.yaml"),
+        Path(f"{cwd}/{name}/analysis_options.yaml"),
     )
 
 
@@ -109,51 +202,78 @@ def create_project_manager(path: Path, name: str = "new_project"):
         progress.update(task2, advance=1)
         progress.stop()
         console.print(
-            "[green] ✓" + f" Project [b]{name}[/b] created successfully![/]",
+            "[green] ✓"
+            + f" Project [b]{name}[/b] created successfully![/]"
+            + f" Run [italic b dim]cd {name}[/].",
         )
 
 
+# functions to make_module
 def make_domain(module_name: str):
-    path_domain = Path(f"{Path.cwd()}/lib/modules/{module_name}")
-    path_subfolders = Path(f"{Path.cwd()}/lib/modules/{module_name}/domain")
+    path_domain = Path(f"{cwd}/lib/modules/{module_name}")
+    path_subfolders = Path(f"{cwd}/lib/modules/{module_name}/domain")
 
-    make_folder("domain", module_name, path_domain)
-    make_folder("entities", module_name, path_subfolders)
-    make_folder("usecases", module_name, path_subfolders)
-    make_folder("repositories", module_name, path_subfolders)
-    make_folder("errors", module_name, path_subfolders)
-    console.print(
-        f"[green]✓ Folder domain created in {module_name} successfully.[/]",
-    )
+    if not path_domain.exists():
+        path_domain.mkdir()
+
+    try:
+        make_folder("domain", module_name, path_domain)
+        make_folder("entities", module_name, path_subfolders)
+        make_folder("usecases", module_name, path_subfolders)
+        make_folder("repositories", module_name, path_subfolders)
+        make_folder("errors", module_name, path_subfolders)
+    except Exception as error:
+        logger.error(f"{error}. ** add error on try bloc in make_domain.")
+    else:
+        console.print(
+            "[green]✓ Folder domain created  \
+            in {module_name} successfully.[/]",
+        )
 
 
 def make_infra(module_name: str):
-    path_infra = Path(f"{Path.cwd()}/lib/modules/{module_name}")
-    path_subfolders = Path(f"{Path.cwd()}/lib/modules/{module_name}/infra")
+    path_infra = Path(f"{cwd}/lib/modules/{module_name}")
+    path_subfolders = Path(f"{cwd}/lib/modules/{module_name}/infra")
 
-    make_folder("infra", module_name, path_infra)
-    make_folder("datasources", module_name, path_subfolders)
-    make_folder("models", module_name, path_subfolders)
-    make_folder("repositories", module_name, path_subfolders)
-    console.print(
-        f"[green]✓ Folder infra created in {module_name} successfully.[/]",
-    )
+    if not path_infra.exists():
+        path_infra.mkdir()
+
+    try:
+        make_folder("infra", module_name, path_infra)
+        make_folder("datasources", module_name, path_subfolders)
+        make_folder("models", module_name, path_subfolders)
+        make_folder("repositories", module_name, path_subfolders)
+        make_folder("drivers", module_name, path_subfolders)
+    except Exception as error:
+        logger.error(f"{error}. **add error on bloc try in make_infra")
+    else:
+        console.print(
+            f"[green]✓ Folder infra created in {module_name} successfully.[/]",
+        )
 
 
 def make_external(module_name: str):
-    path_external = Path(f"{Path.cwd()}/lib/modules/{module_name}")
-    path_subfolders = Path(f"{Path.cwd()}/lib/modules/{module_name}/external")
+    path_external = Path(f"{cwd}/lib/modules/{module_name}")
+    path_subfolders = Path(f"{cwd}/lib/modules/{module_name}/external")
 
-    make_folder("external", module_name, path_external)
-    make_folder("datasources", module_name, path_subfolders)
-    make_folder("drivers", module_name, path_subfolders)
-    console.print(
-        f"[green]✓ Folder external created in {module_name} successfully.[/]",
-    )
+    if not path_external.exists():
+        path_external.mkdir()
+
+    try:
+        make_folder("external", module_name, path_external)
+        make_folder("datasources", module_name, path_subfolders)
+        make_folder("drivers", module_name, path_subfolders)
+    except Exception as error:
+        logger.error(f"{error}. **add error on try bloc in make_external.")
+    else:
+        console.print(
+            f"[green]✓ Folder external created in \
+            {module_name} successfully.[/]"
+        )
 
 
 def make_module(name: str):
-    make_folder(name=name, path=Path(f"{Path.cwd()}/lib/modules"))
+    make_folder(name=name, path=Path(f"{cwd}/lib/modules"))
     make_domain(name)
     make_infra(name)
     make_external(name)
@@ -161,7 +281,7 @@ def make_module(name: str):
         "presentation",
         name,
         Path(
-            f"{Path.cwd()}/lib/modules/{name}",
+            f"{cwd}/lib/modules/{name}",
         ),
     )
     console.print(

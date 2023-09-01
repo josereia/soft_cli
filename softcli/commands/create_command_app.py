@@ -6,7 +6,7 @@ from rich.console import Console
 from tui import Assets
 from typer import Argument, Exit, Typer, Option
 from typing_extensions import Annotated
-from utils import soft_file_manager, make_class_file, get_config_info
+from utils import soft_file_manager, cwd
 
 console = Console()
 command_language = None
@@ -31,17 +31,9 @@ def set_cli_language(language: str):
         logger.error("Language provided not supported by SoftCli.")
 
 
-# def class_name_formatter(name: str) -> str:
-#     print(name)
-#     split_name = name.split("_")
-#     capitalize_parts = [x.capitalize() for x in split_name]
-#     concat_parts = capitalize_parts[0] + capitalize_parts[1] + capitalize_parts[3]
-#     return concat_parts
-
-
 @create_app.command(help=Assets.project_help)
 def project(name: Annotated[str, Argument(..., help="")]) -> None:
-    project_path = Path(f"{Path.cwd()}/{name}")
+    project_path = Path(f"{cwd}/{name}")
     if project_path.exists():
         logger.error(f"Project {name} already exist. Run cd {name}.")
         raise Exit(code=1)
@@ -73,10 +65,15 @@ def module(
         Option("--external", help="Make only external folder in module."),
     ] = False,
 ):
-    language = soft_file_manager(Path(Path.cwd()))
-    command_language = set_cli_language(language[0])
-    command_language.module(name, domain, infra, external)
-    raise Exit()
+    language = soft_file_manager(Path(cwd))[0]
+    command_language = set_cli_language(language)
+    try:
+        command_language.module(name, domain, infra, external)
+    except Exception as error:
+        logger.error(f"{error}. ** add on try bloc in module command.")
+        raise Exit(code=1)
+    else:
+        raise Exit()
 
 
 @create_app.command(help=Assets.datasource_help)
@@ -87,80 +84,76 @@ def datasource(
         Argument(..., help=Assets.datasource_module_name_help),
     ],
 ) -> None:
-    config_info = get_config_info()
-    project_name = config_info[2]
-    # reformular esse bloco
-    split_name1 = name.split("_")
-    capitalize_parts1 = [x.capitalize() for x in split_name1]
-    abstract_class = capitalize_parts1[0] + capitalize_parts1[1]
-    split_name = f"{name}_impl".split("_")
-    capitalize_parts = [x.capitalize() for x in split_name]
-    impl_class = capitalize_parts[0] + capitalize_parts[1] + capitalize_parts[2]
-    # ------------------- fim bloco
-    try:
-        make_class_file(
-            name,
-            Path(f"{Path.cwd()}/lib/modules/{module_name}/infra/datasources"),
-            "datasource_template.dart",
-            {
-                "class_name": abstract_class,
-            },
-        )
-    except IOError:
-        logger.error("Error writing file.")
-        raise Exit(code=1)
-    except Exception as error:
-        logger.error(
-            f"{error}. **Add error on try block in datasource command",
-        )
-        raise Exit(code=1)
-
-    try:
-        make_class_file(
-            f"{name}_impl",
-            Path(f"{Path.cwd()}/lib/modules/{module_name}/external/datasources"),
-            "datasource_impl_template.dart",
-            {
-                "class_name": impl_class,
-                "project_name": project_name,
-                "module_name": module_name,
-                "abstract_file": f"{name}.dart",
-                "abstract_class": abstract_class,
-            },
-        )
-    except IOError:
-        logger.error("Error writing file.")
-        raise Exit(code=1)
-    except Exception as error:
-        logger.error(
-            f"{error}. **Add error on try block in datasource command",
-        )
-        raise Exit(code=1)
-    else:
-        console.print("")
-    raise Exit()
+    language = soft_file_manager(Path(cwd))
+    command_language = set_cli_language(language[0])
+    command_language.datasource(name, module_name)
 
 
 @create_app.command(help=Assets.repository_help)
-def repository(name: Annotated[str, Argument(..., help="")]) -> None:
+def repository(
+    name: Annotated[str, Argument(..., help="")],
+    module_name: Annotated[
+        str,
+        Argument(..., help=""),
+    ],
+) -> None:
+    language = soft_file_manager(Path(cwd))
+    command_language = set_cli_language(language[0])
+    command_language.repository(name, module_name)
     raise Exit()
 
 
 @create_app.command(help=Assets.driver_help)
-def driver(name: Annotated[str, Argument(..., help="")]) -> None:
+def driver(
+    name: Annotated[str, Argument(..., help="")],
+    module_name: Annotated[
+        str,
+        Argument(..., help=""),
+    ],
+) -> None:
+    language = soft_file_manager(Path(cwd))
+    command_language = set_cli_language(language[0])
+    command_language.driver(name, module_name)
     raise Exit()
 
 
 @create_app.command(help=Assets.presentation_help)
-def presentation(name: Annotated[str, Argument(..., help="")]) -> None:
+def presentation(
+    name: Annotated[str, Argument(..., help="")],
+    module_name: Annotated[
+        str,
+        Argument(..., help=""),
+    ],
+) -> None:
+    language = soft_file_manager(Path(cwd))
+    command_language = set_cli_language(language[0])
+    command_language.presentation(name, module_name)
     raise Exit()
 
 
 @create_app.command(help=Assets.usecase_help)
-def usecase(name: Annotated[str, Argument(..., help="")]) -> None:
+def usecase(
+    name: Annotated[str, Argument(..., help="")],
+    module_name: Annotated[
+        str,
+        Argument(..., help=""),
+    ],
+) -> None:
+    language = soft_file_manager(Path(cwd))
+    command_language = set_cli_language(language[0])
+    command_language.usecase(name, module_name)
     raise Exit()
 
 
 @create_app.command(help=Assets.error_help)
-def error(name: Annotated[str, Argument(..., help="")]) -> None:
+def error(
+    name: Annotated[str, Argument(..., help="")],
+    module_name: Annotated[
+        str,
+        Argument(..., help=""),
+    ],
+) -> None:
+    language = soft_file_manager(Path(cwd))
+    command_language = set_cli_language(language[0])
+    command_language.error(name, module_name)
     raise Exit()
